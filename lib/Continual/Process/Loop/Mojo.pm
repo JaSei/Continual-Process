@@ -61,4 +61,3 @@ Jan Seidl E<lt>seidl@avast.comE<gt>
 =cut
 
 1;
-

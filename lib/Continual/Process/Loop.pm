@@ -3,8 +3,9 @@ use strict;
 use warnings;
 
 use Class::Tiny { 
-    instances => [], 
-    interval  => 1,
+    instances   => [], 
+    interval    => 1,
+    on_interval => undef,
 };
 
 =head1 NAME
@@ -31,6 +32,12 @@ interval of allive checking
 
 default is I<1>sec
 
+=head4 on_interval
+
+CodeRef which is called each check interval
+
+default is I<disabled>
+
 =head2 add($instance)
 
 add C<$instance> (instance of L<Continual::Process::Instance>) to loop
@@ -55,6 +62,8 @@ sub run {
 
 sub _check_and_run_death {
     my ($self) = @_;
+
+    $self->on_interval->() if defined $self->on_interval;
 
     foreach my $task (@{ $self->instances }) {
         if (!$task->is_allive) {

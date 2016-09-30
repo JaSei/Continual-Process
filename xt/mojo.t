@@ -16,6 +16,7 @@ use File::Temp;
 $ENV{C_P_DEBUG} = 1;
 
 my $tmp  = File::Temp->new();
+my $tick = 1;
 my $loop = Continual::Process::Loop::Mojo->new(
     instances => [
         Continual::Process->new(
@@ -51,11 +52,16 @@ my $loop = Continual::Process::Loop::Mojo->new(
             },
         )->create_instance(),
     ],
+    on_interval => sub {
+        if (!$tick--) {
+            Mojo::IOLoop->stop();
+        }
+    }
 );
 
 Mojo::IOLoop->timer(
-    2 => sub {
-        Mojo::IOLoop->stop();
+    0 => sub {
+        pass('Mojo async tick');
     }
 );
 
@@ -74,7 +80,7 @@ runs_check(
     }
 );
 
-done_testing(1);
+done_testing(2);
 
 sub runs_check {
     my ($tmp, $expected) = @_;

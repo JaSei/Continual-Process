@@ -17,6 +17,8 @@ use File::Temp;
 $ENV{C_P_DEBUG} = 1;
 
 my $tmp  = File::Temp->new();
+my $tick = 1;
+my $cv = AnyEvent->condvar;
 my $loop = Continual::Process::Loop::AnyEvent->new(
     instances => [
         Continual::Process->new(
@@ -38,14 +40,18 @@ my $loop = Continual::Process::Loop::AnyEvent->new(
             }),
         )->create_instance(),
     ],
+    on_interval => sub {
+        if (!$tick--) {
+            $cv->send();
+        }
+    }
 );
 
 $loop->run();
 
-my $cv = AnyEvent->condvar;
 my $end_timer = AnyEvent->timer(
-    after => 1,
-    cb    => sub {$cv->send()}
+    after => 0,
+    cb    => sub {pass('AnyEvent async tick')}
 );
 $cv->recv();
 
@@ -62,7 +68,7 @@ runs_check(
     }
 );
 
-done_testing(1);
+done_testing(2);
 
 sub runs_check {
     my ($tmp, $expected) = @_;
