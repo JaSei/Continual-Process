@@ -1,4 +1,4 @@
-
+[![Build Status](https://travis-ci.org/JaSei/Continual-Process.svg?branch=master)](https://travis-ci.org/JaSei/Continual-Process)
 # NAME
 
 Continual::Process - (re)start death process 

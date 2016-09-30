@@ -1,8 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
-use v5.12;
+use Test::More;
+
+BEGIN {
+    if (!eval { require AnyEvent; AnyEvent->import; 1 }) {
+        plan skip_all => "AnyEvent is required for this test";
+    }
+}
+
 use Continual::Process;
 use Continual::Process::Loop::AnyEvent;
 use File::Temp;
@@ -68,6 +74,8 @@ runs_check(
         'job1.4' => 2,
     }
 );
+
+done_testing(1);
 
 sub runs_check {
     my ($tmp, $expected) = @_;

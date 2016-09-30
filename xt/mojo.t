@@ -8,7 +8,7 @@ BEGIN {
         plan skip_all => "Mojo::IOLoop is required for this test";
     }
 }
-use v5.12;
+
 use Continual::Process;
 use Continual::Process::Loop::Mojo;
 use File::Temp;

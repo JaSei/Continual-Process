@@ -92,7 +92,7 @@ sub _pid_check {
     if (!defined $pid) {
         die 'Undefined PID';
     }
-    if ($pid !~ /^\d+$/) {
+    if ($pid !~ /^(?:-)?\d+$/) {
         die "Returned PID ($pid) " . $self->name . " doesn't number!";
     }
 
@@ -115,8 +115,9 @@ sub DESTROY {
     my ($self) = @_;
 
     #destroy only in parent (main) process
-    if (defined $self->parent_pid && $self->parent_pid == $$ && $self->pid) {
-        print "# Kill ($$) PID ".$self->pid."\n" if $ENV{C_P_DEBUG};
+	#ignore pseudo-process (<0) is threads and threads died with main
+    if (defined $self->parent_pid && $self->parent_pid == $$ && $self->pid && $self->pid > 0) {
+        print "# Kill PID ".$self->pid."\n" if $ENV{C_P_DEBUG};
         kill 15, $self->pid;
     }
 }

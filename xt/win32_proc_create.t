@@ -16,6 +16,7 @@ $ENV{C_P_DEBUG} = 1;
 
 my $tick = 2;
 my $tmp = File::Temp->new();
+close $tmp;
 my $loop = Continual::Process::Loop::Simple->new(
     instances => [
         Continual::Process->new(
@@ -28,7 +29,9 @@ my $loop = Continual::Process::Loop::Simple->new(
                     return $pid;
                 }
 
-                print $tmp $instance->id."\n";
+                open my $t, '>>', $tmp;
+                print $t $instance->id."\n";
+                close $t;
 
                 exit 1;
             },
@@ -42,9 +45,9 @@ my $loop = Continual::Process::Loop::Simple->new(
                 my $instance_id = $instance->id;
 
                 Win32::Process::Create(
-                    $proc,
+                    my $proc,
                     $^X,
-                    qq{perl -e "open my \$file, '<<', $tmp; print \$file $instance_id; close \$file; sleep 10"}, 
+                    qq{perl -E "open my \$file, '>>', '$tmp'; say \$file '$instance_id'; close \$file; while(1) {sleep 1}"}, 
                     0,
                     NORMAL_PRIORITY_CLASS,
                     "."
@@ -71,8 +74,6 @@ runs_check($tmp, {
 
 sub runs_check {
     my ($tmp, $expected) = @_;
-
-    close $tmp;
 
     open my $file, '<', $tmp;
     my @rows = <$file>;

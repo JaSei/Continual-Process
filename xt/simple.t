@@ -1,8 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
-use v5.12;
+use Test::More;
+
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        plan skip_all => "Fork-exec is problematic construct for windows";
+    }
+}
+
 use Continual::Process;
 use Continual::Process::Loop::Simple;
 use File::Temp;
@@ -58,6 +64,8 @@ runs_check($tmp, {
         'job1.3' => 2,
         'job1.4' => 2,
     });
+
+done_testing(1);
 
 sub runs_check {
     my ($tmp, $expected) = @_;
