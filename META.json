@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "(re)start death process ",
    "author" : [
       "Jan Seidl <seidl@avast.com>"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "Recurring-Process",
+   "name" : "Continual-Process",
    "no_index" : {
       "directory" : [
          "t",
@@ -32,6 +32,9 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Minilla" : "0"
+         },
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
@@ -42,17 +45,23 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Tiny" : "0",
             "perl" : "5.008001"
          }
       },
       "test" : {
+         "recommends" : {
+            "AnyEvent" : "0",
+            "Mojo::IOLoop" : "0"
+         },
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
       }
    },
    "release_status" : "unstable",
-   "version" : "0.01",
+   "version" : "0.1.0",
    "x_authority" : "cpan:JASEI",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }
