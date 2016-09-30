@@ -10,6 +10,6 @@ perl:
   - "5.22"
   - "5.24"
 install:
-    cpanm --quiet --installdeps --notest --with-recommends .
+    cpanm --quiet --installdeps --notest --with-recommends --with-develop .
 script:
     minil test --release
