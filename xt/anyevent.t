@@ -55,7 +55,7 @@ my $end_timer = AnyEvent->timer(
 );
 $cv->recv();
 
-sleep 1;
+sleep 4;
 
 runs_check(
     $tmp,
