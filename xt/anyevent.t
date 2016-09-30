@@ -11,6 +11,7 @@ BEGIN {
 
 use Continual::Process;
 use Continual::Process::Loop::AnyEvent;
+use Continual::Process::Helper qw(prepare_fork);
 use File::Temp;
 
 $ENV{C_P_DEBUG} = 1;
@@ -20,35 +21,21 @@ my $loop = Continual::Process::Loop::AnyEvent->new(
     instances => [
         Continual::Process->new(
             name => 'job1',
-            code => sub {
+            code => prepare_fork(sub {
                 my ($instance) = @_;
 
-                my $pid = fork;
-                if ($pid) {
-                    return $pid;
-                }
-
                 print $tmp $instance->id . "\n";
-
-                exit 1;
-            },
+            }),
             instances => 4,
           )->create_instance(),
         Continual::Process->new(
             name => 'job2',
-            code => sub {
+            code => prepare_fork(sub {
                 my ($instance) = @_;
 
-                my $pid = fork;
-                if ($pid) {
-                    return $pid;
-                }
-
                 print $tmp $instance->id . "\n";
-                exec 'perl -ne "sleep 1"';
-
-                exit 1;
-            },
+                exec {$^X} '-ne "sleep 1"';
+            }),
         )->create_instance(),
     ],
 );

@@ -46,7 +46,7 @@ my $loop = Continual::Process::Loop::Simple->new(
                 }
 
                 print $tmp $instance->id."\n";
-                exec 'perl -ne "sleep 1"';
+                exec {$^X} '-ne "sleep 1"';
 
                 exit 1;
             },
