@@ -11,3 +11,5 @@ perl:
   - "5.24"
 install:
     cpanm --quiet --installdeps --notest --with-recommends .
+script:
+    minil test --release
