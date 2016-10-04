@@ -12,4 +12,4 @@ perl:
 install:
     cpanm --quiet --installdeps --notest --with-recommends --with-develop .
 script:
-    minil test --release
+    minil test

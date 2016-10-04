@@ -4,13 +4,23 @@ use warnings;
 
 use parent 'Continual::Process::Loop';
 
+use Mojo::Base 'Mojo::EventEmitter';
+
 use Mojo::IOLoop;
+use Try::Tiny;
+use Class::Tiny {
+    on_catch => sub {
+        Mojo::IOLoop->stop();
+        die @_;
+    }
+};
 
 =head1 NAME
 
 Continual::Process::Loop::Mojo - loop with Mojo::IOLoop support
 
 =head1 SYNOPSIS
+
     my $loop = Continual::Process::Loop::Mojo->new(
         instances => [
             Continual::Process::Instance->new(...),
@@ -29,6 +39,8 @@ This is implementation of L<Continual::Process::Loop> with L<Mojo::IOLoop>.
 
 Is usefull if you can use next L<Mojo::IOLoop> events in loop.
 
+This module is really EXPERIMENTAL, for example C<die> is not catched yet.
+
 =head1 METHODS
 
 All methods are inherits from L<Continual::Process::Loop>.
@@ -41,7 +53,16 @@ sub run {
     my $loop = Mojo::IOLoop->singleton();
 
     $loop->recurring(
-        $self->interval => sub {$self->_check_and_run_death()}
+        $self->interval => sub {
+                $self->_check_and_run_death()
+        }
+    );
+
+    $self->on(
+        error => sub {
+            warn "Mojo exception @_";
+
+        }
     );
 
     $loop->start() if !$loop->is_running();

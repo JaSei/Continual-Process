@@ -37,6 +37,8 @@ This is implementation of L<Continual::Process::Loop> with L<AnyEvent>.
 
 Is usefull if you can use next L<AnyEvent> events in loop.
 
+This module is really EXPERIMENTAL, for example C<die> is not catched yet.
+
 =head1 METHODS
 
 All methods are inherits from L<Continual::Process::Loop>.

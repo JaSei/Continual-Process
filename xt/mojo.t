@@ -67,7 +67,7 @@ Mojo::IOLoop->timer(
 
 $loop->run();
 
-sleep 4;
+sleep 1;
 
 runs_check(
     $tmp,
