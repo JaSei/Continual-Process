@@ -29,3 +29,6 @@ cover_db/
 MYMETA.*
 
 /Recurring-Process-*
+
+.carmel/
+cpanfile.snapshot
