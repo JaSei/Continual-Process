@@ -10,13 +10,13 @@ use Class::Tiny qw(name code), { instances => 1, };
 
 =head1 NAME
 
-Continual::Process - (re)start death process 
+Continual::Process - (re)start dead process
 
 =head1 SYNOPSIS
 
     use Continual::Process;
     use Continual::Process::Loop;
-    
+
     my $loop = Continual::Process::Loop->new(
         instances => [
             Continual::Process->new(
@@ -26,11 +26,11 @@ Continual::Process - (re)start death process
                     if ($pid) {
                         return $pid;
                     }
-    
+
                     say "Hello world";
                     sleep 5;
                     say "Bye, bye world";
-    
+
                     exit 1;
                 },
                 instances => 4,
@@ -42,28 +42,28 @@ Continual::Process - (re)start death process
                     if ($pid) {
                         return $pid;
                     }
-    
+
                     exec 'perl -ne "sleep 1"';
-    
+
                     exit 1;
                 },
             )->create_instance(),
         ]
     );
-    
+
     $loop->run();
 
 =head1 DESCRIPTION
 
-Continual::Process with Continual::Process::Loop is way how running process forever.
+Continual::Process with Continual::Process::Loop is a way how to run a process forever.
 
-Continual::Process creates Continual::Process::Instance which running in loop and if die, is start again.
+Continual::Process creates Continual::Process::Instance which runs in a loop and if it dies, it starts again.
 
-Code for start process is OS-agnostic. The only condition is code must return PID of new process. 
+The code for starting a process is OS-agnostic. The only condition is that the code must return PID of the new process.
 
 =head2 loop
 
-Continual::Process support more loops:
+Continual::Process supports more loops:
 
 =over 1
 
@@ -83,15 +83,15 @@ Continual::Process support more loops:
 
 =head4 name
 
-name of process (only for identify)
+name of process (only for identification)
 
 =head4 code
 
 CodeRef which start new process and returned C<PID> of new process
 
-I<code>-sub B<must> return C<PID> of new process or die!
+I<code>-sub B<must> return C<PID> of the new process or die!
 
-for example linux and fork:
+for example Linux and fork:
 
     code => sub {
         if (my $pid  = fork) {
@@ -103,21 +103,21 @@ for example linux and fork:
         exit 1;
     }
 
-or windows and L<Win32::Process>
+or Windows and L<Win32::Process>
 
     code => sub {
         my ($instance) = @_;
 
-		Win32::Process::Create(
-			$ProcessObj,
-        	"C:\\winnt\\system32\\notepad.exe",
-        	"notepad temp.txt",
-        	0,
-        	NORMAL_PRIORITY_CLASS,
-        	"."
+        Win32::Process::Create(
+            $ProcessObj,
+            "C:\\winnt\\system32\\notepad.exe",
+            "notepad temp.txt",
+            0,
+            NORMAL_PRIORITY_CLASS,
+            "."
         ) || die "Process ".$instance->name." start fail: ".$^E;
- 
-		return $ProcessObj->GetProcessID();
+
+        return $ProcessObj->GetProcessID();
     }
 
 best way is use L<Continual::Process::Helper> C<prepare_fork> or C<prepare_run> method

@@ -8,16 +8,16 @@ use_ok('Continual::Process');
 
 subtest 'constructor' => sub {
     throws_ok {
-        Continual::Process->new();    
+        Continual::Process->new();
     } qr/name attribute required/, 'name attribute';
 
     throws_ok {
-        Continual::Process->new(name => 'test');    
+        Continual::Process->new(name => 'test');
     } qr/code attribute required/, 'code attribute';
 
     throws_ok {
-        Continual::Process->new(name => 'test', code => 'blabla');    
-    } qr/code attribute .+ CodeRef/, 'code attribute doesn\'t coderef';
+        Continual::Process->new(name => 'test', code => 'blabla');
+    } qr/code attribute .+ CodeRef/, 'code attribute isn\'t coderef';
 };
 
 subtest 'default instances' => sub {
@@ -25,7 +25,7 @@ subtest 'default instances' => sub {
         name => 'test',
         code => sub { },
     );
-    
+
     my @instances = $proc->create_instance();
 
     is(scalar @instances, 1, 'count of instances');
@@ -38,7 +38,7 @@ subtest 'more instances' => sub {
         code        => sub { },
         instances   => 10,
     );
-    
+
     my @instances = $proc->create_instance();
 
     is(scalar @instances, 10, 'count of instances');

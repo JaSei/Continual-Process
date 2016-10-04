@@ -27,7 +27,7 @@ Continual::Process::Instance - one instance
     )->start();
 
     while(1) {
-        if (!$instance->is_allive()) {
+        if (!$instance->is_alive()) {
             $instance->start();
         }
     }
@@ -93,19 +93,19 @@ sub _pid_check {
         die 'Undefined PID';
     }
     if ($pid !~ /^(?:-)?\d+$/) {
-        die "Returned PID ($pid) " . $self->name . " doesn't number!";
+        die "Returned PID ($pid) " . $self->name . " isn't number!";
     }
 
     return $pid;
 }
 
-=head2 is_allive()
+=head2 is_alive()
 
-is this instance allive?
+is this instance alive?
 
 =cut
 
-sub is_allive {
+sub is_alive {
     my ($self) = @_;
 
     return defined $self->pid && !waitpid $self->pid, WNOHANG;
@@ -114,8 +114,8 @@ sub is_allive {
 sub DESTROY {
     my ($self) = @_;
 
-    #destroy only in parent (main) process
-	#ignore pseudo-process (<0) is threads and threads died with main
+    # destroy only in parent (main) process
+    # ignore pseudo-process (<0) is threads and threads died with main
     if (defined $self->parent_pid && $self->parent_pid == $$ && $self->pid && $self->pid > 0) {
         print "# Kill PID ".$self->pid."\n" if $ENV{C_P_DEBUG};
         kill 15, $self->pid;
