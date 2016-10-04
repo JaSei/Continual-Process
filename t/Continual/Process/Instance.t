@@ -8,20 +8,20 @@ use_ok('Continual::Process::Instance');
 
 subtest 'constructor' => sub {
     throws_ok {
-        Continual::Process::Instance->new();    
+        Continual::Process::Instance->new();
     } qr/name attribute required/, 'name attribute';
 
     throws_ok {
-        Continual::Process::Instance->new(name => 'test');    
+        Continual::Process::Instance->new(name => 'test');
     } qr/instance_id attribute required/, 'instance_id attribute';
 
     throws_ok {
-        Continual::Process::Instance->new(name => 'test', instance_id => 1);    
+        Continual::Process::Instance->new(name => 'test', instance_id => 1);
     } qr/code attribute required/, 'code attribute';
 
     throws_ok {
-        Continual::Process::Instance->new(name => 'test', instance_id => 1, code => 'blabla');    
-    } qr/code attribute .+ CodeRef/, 'code attribute doesn\'t coderef';
+        Continual::Process::Instance->new(name => 'test', instance_id => 1, code => 'blabla');
+    } qr/code attribute .+ CodeRef/, 'code attribute isn\'t coderef';
 
     done_testing(4);
 };
@@ -49,7 +49,7 @@ subtest 'invalid pid' => sub {
 
     throws_ok {
         $proc->start();
-    } qr/PID .+ doesn't number/, 'doesn\'t number check';
+    } qr/PID .+ isn't number/, 'isn\'t number check';
 
     done_testing(2);
 };
@@ -73,7 +73,7 @@ lives_ok {
     $proc->start();
 } 'start';
 
-ok($proc->is_allive(), 'process is allive');
+ok($proc->is_alive(), 'process is alive');
 
 #destroy check
 undef $proc;
@@ -86,4 +86,4 @@ $proc = Continual::Process::Instance->new(
     }
 );
 
-ok(!$proc->is_allive(), 'proccess is death after destrcution');
+ok(!$proc->is_alive(), 'proccess is death after destrcution');

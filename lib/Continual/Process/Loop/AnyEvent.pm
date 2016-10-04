@@ -35,11 +35,11 @@ Continual::Process::Loop::AnyEvent - loop with AnyEvent support
 
 This is implementation of L<Continual::Process::Loop> with L<AnyEvent>.
 
-Is usefull if you can use next L<AnyEvent> events in loop.
+It is useful if you can use another L<AnyEvent> events in loop.
 
 =head1 METHODS
 
-All methods are inherits from L<Continual::Process::Loop>.
+All methods inherit from L<Continual::Process::Loop>.
 
 =cut
 

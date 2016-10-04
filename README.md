@@ -1,13 +1,13 @@
 [![Build Status](https://travis-ci.org/JaSei/Continual-Process.svg?branch=master)](https://travis-ci.org/JaSei/Continual-Process)
 # NAME
 
-Continual::Process - (re)start death process 
+Continual::Process - (re)start dead process
 
 # SYNOPSIS
 
     use Continual::Process;
     use Continual::Process::Loop;
-    
+
     my $loop = Continual::Process::Loop->new(
         instances => [
             Continual::Process->new(
@@ -17,11 +17,11 @@ Continual::Process - (re)start death process
                     if ($pid) {
                         return $pid;
                     }
-    
+
                     say "Hello world";
                     sleep 5;
                     say "Bye, bye world";
-    
+
                     exit 1;
                 },
                 instances => 4,
@@ -33,28 +33,28 @@ Continual::Process - (re)start death process
                     if ($pid) {
                         return $pid;
                     }
-    
+
                     exec 'perl -ne "sleep 1"';
-    
+
                     exit 1;
                 },
             )->create_instance(),
         ]
     );
-    
+
     $loop->run();
 
 # DESCRIPTION
 
-Continual::Process with Continual::Process::Loop is way how running process forever.
+Continual::Process with Continual::Process::Loop is a way how to run a process forever.
 
-Continual::Process creates Continual::Process::Instance which running in loop and if die, is start again.
+Continual::Process creates Continual::Process::Instance which runs in a loop and if it dies, it starts again.
 
-Code for start process is OS-agnostic. The only condition is code must return PID of new process. 
+The code for starting a process is OS-agnostic. The only condition is that the code must return PID of the new process.
 
 ## loop
 
-Continual::Process support more loops:
+Continual::Process supports more loops:
 
 - [Continual::Process::Loop::Simple](https://metacpan.org/pod/Continual::Process::Loop::Simple) - simple while/sleep loop
 - [Continual::Process::Loop::AnyEvent](https://metacpan.org/pod/Continual::Process::Loop::AnyEvent) - [AnyEvent](https://metacpan.org/pod/AnyEvent) support
@@ -68,15 +68,15 @@ Continual::Process support more loops:
 
 #### name
 
-name of process (only for identify)
+name of process (only for identification)
 
 #### code
 
 CodeRef which start new process and returned `PID` of new process
 
-_code_-sub **must** return `PID` of new process or die!
+_code_-sub **must** return `PID` of the new process or die!
 
-for example linux and fork:
+for example Linux and fork:
 
     code => sub {
         if (my $pid  = fork) {
@@ -88,22 +88,22 @@ for example linux and fork:
         exit 1;
     }
 
-or windows and [Win32::Process](https://metacpan.org/pod/Win32::Process)
+or Windows and [Win32::Process](https://metacpan.org/pod/Win32::Process)
 
-       code => sub {
-           my ($instance) = @_;
+    code => sub {
+        my ($instance) = @_;
 
-                   Win32::Process::Create(
-                           $ProcessObj,
-                   "C:\\winnt\\system32\\notepad.exe",
-                   "notepad temp.txt",
-                   0,
-                   NORMAL_PRIORITY_CLASS,
-                   "."
-           ) || die "Process ".$instance->name." start fail: ".$^E;
-    
-                   return $ProcessObj->GetProcessID();
-       }
+        Win32::Process::Create(
+            $ProcessObj,
+            "C:\\winnt\\system32\\notepad.exe",
+            "notepad temp.txt",
+            0,
+            NORMAL_PRIORITY_CLASS,
+            "."
+        ) || die "Process ".$instance->name." start fail: ".$^E;
+
+        return $ProcessObj->GetProcessID();
+    }
 
 #### instances
 

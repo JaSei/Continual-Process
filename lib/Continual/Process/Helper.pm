@@ -70,7 +70,7 @@ sub prepare_fork {
 
 =head2 prepare_run($executable, $args)
 
-prepare and return correct (multiplatform) CodeRef which return PID
+prepare and return correct (multiplatform) CodeRef which returns PID
 
 for Windows use L<Win32::Process>, for other platform fork-exec pattern
 

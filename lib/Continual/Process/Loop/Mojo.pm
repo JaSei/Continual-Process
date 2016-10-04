@@ -27,11 +27,11 @@ Continual::Process::Loop::Mojo - loop with Mojo::IOLoop support
 
 This is implementation of L<Continual::Process::Loop> with L<Mojo::IOLoop>.
 
-Is usefull if you can use next L<Mojo::IOLoop> events in loop.
+It is useful if you use other L<Mojo::IOLoop> events in loop.
 
 =head1 METHODS
 
-All methods are inherits from L<Continual::Process::Loop>.
+All methods inherit from L<Continual::Process::Loop>.
 
 =cut
 

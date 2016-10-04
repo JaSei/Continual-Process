@@ -28,7 +28,7 @@ I<ArrayRef> of instances - default is empty (C<[]>)
 
 =head4 interval
 
-interval of allive checking
+interval of alive checking
 
 default is I<1>sec
 
@@ -66,7 +66,7 @@ sub _check_and_run_death {
     $self->on_interval->() if defined $self->on_interval;
 
     foreach my $task (@{ $self->instances }) {
-        if (!$task->is_allive) {
+        if (!$task->is_alive) {
             $task->start();
         }
     }
