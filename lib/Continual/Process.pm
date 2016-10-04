@@ -1,9 +1,18 @@
-[![Build Status](https://travis-ci.org/JaSei/Continual-Process.svg?branch=master)](https://travis-ci.org/JaSei/Continual-Process)
-# NAME
+package Continual::Process;
+use strict;
+use warnings;
+
+our $VERSION = '0.1.0';
+
+use POSIX qw(:sys_wait_h);
+use Continual::Process::Instance;
+use Class::Tiny qw(name code), { instances => 1, };
+
+=head1 NAME
 
 Continual::Process - (re)start dead process
 
-# SYNOPSIS
+=head1 SYNOPSIS
 
     use Continual::Process;
     use Continual::Process::Loop;
@@ -44,7 +53,7 @@ Continual::Process - (re)start dead process
 
     $loop->run();
 
-# DESCRIPTION
+=head1 DESCRIPTION
 
 Continual::Process with Continual::Process::Loop is a way how to run a process forever.
 
@@ -52,29 +61,35 @@ Continual::Process creates Continual::Process::Instance which runs in a loop and
 
 The code for starting a process is OS-agnostic. The only condition is that the code must return PID of the new process.
 
-## loop
+=head2 loop
 
 Continual::Process supports more loops:
 
-- [Continual::Process::Loop::Simple](https://metacpan.org/pod/Continual::Process::Loop::Simple) - simple while/sleep loop
-- [Continual::Process::Loop::AnyEvent](https://metacpan.org/pod/Continual::Process::Loop::AnyEvent) - [AnyEvent](https://metacpan.org/pod/AnyEvent) support
-- [Continual::Process::Loop::Mojo](https://metacpan.org/pod/Continual::Process::Loop::Mojo) - [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop) support
+=over 1
 
-# METHODS
+=item L<Continual::Process::Loop::Simple> - simple while/sleep loop
 
-## new(%attributes)
+=item L<Continual::Process::Loop::AnyEvent> - L<AnyEvent> support
 
-### %attributes
+=item L<Continual::Process::Loop::Mojo> - L<Mojo::IOLoop> support
 
-#### name
+=back
+
+=head1 METHODS
+
+=head2 new(%attributes)
+
+=head3 %attributes
+
+=head4 name
 
 name of process (only for identification)
 
-#### code
+=head4 code
 
-CodeRef which start new process and returned `PID` of new process
+CodeRef which start new process and returned C<PID> of new process
 
-_code_-sub **must** return `PID` of the new process or die!
+I<code>-sub B<must> return C<PID> of the new process or die!
 
 for example Linux and fork:
 
@@ -88,7 +103,7 @@ for example Linux and fork:
         exit 1;
     }
 
-or Windows and [Win32::Process](https://metacpan.org/pod/Win32::Process)
+or Windows and L<Win32::Process>
 
     code => sub {
         my ($instance) = @_;
@@ -105,25 +120,61 @@ or Windows and [Win32::Process](https://metacpan.org/pod/Win32::Process)
         return $ProcessObj->GetProcessID();
     }
 
-best way is use [Continual::Process::Helper](https://metacpan.org/pod/Continual::Process::Helper) `prepare_fork` or `prepare_run` method
+best way is use L<Continual::Process::Helper> C<prepare_fork> or C<prepare_run> method
 
-#### instances
+=head4 instances
 
 count of running instances
 
-default _1_
+default I<1>
 
-## create\_instance()
+=cut
 
-create and return list of [Continual::Process::Instance](https://metacpan.org/pod/Continual::Process::Instance)
+sub BUILD {
+    my ($self) = @_;
 
-# LICENSE
+    foreach my $req (qw/name code/) {
+        die "$req attribute required" if !defined $self->$req;
+    }
+
+    if (ref $self->code ne 'CODE') {
+        die 'code attribute must be CodeRef';
+    }
+}
+
+=head2 create_instance()
+
+create and return list of L<Continual::Process::Instance>
+
+=cut
+sub create_instance {
+    my ($self) = @_;
+
+    my @instances;
+
+    foreach my $instance_id (1 .. $self->instances) {
+        push @instances,
+          Continual::Process::Instance->new(
+            name          => $self->name,
+            instance_id   => $instance_id,
+            code          => $self->code,
+          );
+    }
+
+    return @instances;
+}
+
+=head1 LICENSE
 
 Copyright (C) Avast Software.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-# AUTHOR
+=head1 AUTHOR
 
-Jan Seidl <seidl@avast.com>
+Jan Seidl E<lt>seidl@avast.comE<gt>
+
+=cut
+
+1;
