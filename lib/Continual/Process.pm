@@ -120,6 +120,8 @@ or windows and L<Win32::Process>
 		return $ProcessObj->GetProcessID();
     }
 
+best way is use L<Continual::Process::Helper> C<prepare_fork> or C<prepare_run> method
+
 =head4 instances
 
 count of running instances

@@ -105,6 +105,8 @@ or windows and [Win32::Process](https://metacpan.org/pod/Win32::Process)
                    return $ProcessObj->GetProcessID();
        }
 
+best way is use [Continual::Process::Helper](https://metacpan.org/pod/Continual::Process::Helper) `prepare_fork` or `prepare_run` method
+
 #### instances
 
 count of running instances
