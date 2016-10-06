@@ -100,6 +100,8 @@ sub _prepare_run_win {
             NORMAL_PRIORITY_CLASS,
             "."
         ) || die "Process ".$instance->id."start fail $^E";
+
+        return $proc->GetProcesID();
     };
 }
 

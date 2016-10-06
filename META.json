@@ -72,7 +72,7 @@
          "web" : "https://github.com/JaSei/Continual-Process"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_authority" : "cpan:JASEI",
    "x_contributors" : [
       "Miroslav Tynovsky <tynovsky@avast.com>",
