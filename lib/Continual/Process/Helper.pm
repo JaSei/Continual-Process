@@ -122,8 +122,9 @@ sub _prepare_run_other {
         my ($instance) = @_;
 
         $ENV{C_P_INSTANCE_ID} = $instance->id();
-        exec {$executable} $args;
-        die "Exec fail";
+        print "# $executable $args\n" if $ENV{C_P_DEBUG}; 
+        exec $executable, $args;
+        die "exec fail";
     });
 }
 

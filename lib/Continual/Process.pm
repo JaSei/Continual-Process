@@ -2,7 +2,7 @@ package Continual::Process;
 use strict;
 use warnings;
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 use POSIX qw(:sys_wait_h);
 use Continual::Process::Instance;
