@@ -11,12 +11,13 @@ BEGIN {
 
 use Continual::Process;
 use Continual::Process::Loop::AnyEvent;
-use Continual::Process::Helper qw(prepare_fork);
+use Continual::Process::Helper qw(prepare_fork prepare_run);
 use File::Temp;
 
 $ENV{C_P_DEBUG} = 1;
 
 my $tmp  = File::Temp->new();
+close $tmp;
 my $tick = 1;
 my $cv = AnyEvent->condvar;
 my $loop = Continual::Process::Loop::AnyEvent->new(
@@ -26,18 +27,15 @@ my $loop = Continual::Process::Loop::AnyEvent->new(
             code => prepare_fork(sub {
                 my ($instance) = @_;
 
-                print $tmp $instance->id . "\n";
+                open my $t, '>>', $tmp;
+                print $t $instance->id . "\n";
+                close $t;
             }),
             instances => 4,
           )->create_instance(),
         Continual::Process->new(
             name => 'job2',
-            code => prepare_fork(sub {
-                my ($instance) = @_;
-
-                print $tmp $instance->id . "\n";
-                exec {$^X} '-ne "sleep 1"';
-            }),
+            code => prepare_run($^X, qq{-E "open my \$file, '>>', '$tmp'; say \$file \"\$ENV{C_P_INSTANCE_ID}\n\"; close \$file; while(1) {sleep 1}"}),
         )->create_instance(),
     ],
     on_interval => sub {
@@ -85,5 +83,6 @@ sub runs_check {
         $histo{$row}++;
     }
 
-    is_deeply(\%histo, $expected, 'runs check');
+    is_deeply(\%histo, $expected, 'runs check')
+        or diag(join "\n", @rows);
 }
