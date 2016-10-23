@@ -6,6 +6,7 @@ on 'test' => sub {
     requires 'Test::Exception';
     recommends 'AnyEvent';
     recommends 'Mojo::IOLoop';
+    recommends 'IO::Async';
 };
 
 on 'develop' => sub {
