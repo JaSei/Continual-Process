@@ -8,6 +8,7 @@ BEGIN {
 };
 
 use Continual::Process;
+use Continual::Process::Helper qw(prepare_fork prepare_run);
 use Continual::Process::Loop::Simple;
 use Win32::Process;
 use File::Temp;
@@ -21,40 +22,18 @@ my $loop = Continual::Process::Loop::Simple->new(
     instances => [
         Continual::Process->new(
             name => 'job1',
-            code => sub {
+            code => prepare_fork(sub {
                 my ($instance) = @_;
 
-                my $pid = fork;
-                if ($pid) {
-                    return $pid;
-                }
-
                 open my $t, '>>', $tmp;
-                print $t $instance->id."\n";
+                print $t $instance->id . "\n";
                 close $t;
-
-                exit 1;
-            },
+            }),
             instances => 4,
         )->create_instance(),
         Continual::Process->new(
             name => 'job2',
-            code => sub {
-                my ($instance) = @_;
-
-                my $instance_id = $instance->id;
-
-                Win32::Process::Create(
-                    my $proc,
-                    $^X,
-                    qq{perl -E "open my \$file, '>>', '$tmp'; say \$file '$instance_id'; close \$file; while(1) {sleep 1}"}, 
-                    0,
-                    NORMAL_PRIORITY_CLASS,
-                    "."
-                ) || die "Process ".$instance->id."start fail $^E";
-
-                return $proc->GetProcessID();
-            },
+            code => prepare_run($^X, qq{-E "open my \$file, '>>', '$tmp'; say \$file \"\$ENV{C_P_INSTANCE_ID}\n\"; close \$file; while(1) {sleep 1}"}),
         )->create_instance(),
     ],
     tick => sub { $tick-- }

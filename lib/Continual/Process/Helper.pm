@@ -6,17 +6,16 @@ use parent 'Exporter';
 
 our @EXPORT_OK = qw(prepare_fork prepare_run);
 
+use constant WINDOWS => ($^O eq 'MSWin32');
+
 BEGIN {
-    if ($^O eq 'MSWin32') {
+    if (WINDOWS) {
         ## no critic (ProhibitStringyEval)
         eval q{
             use Win32::Process qw(NORMAL_PRIORITY_CLASS);
         };
 
         die $@ if $@;
-    }
-    else {
-        use constant NORMAL_PRIORITY_CLASS => 'fake';
     }
 }
 
@@ -35,7 +34,7 @@ Continual::Process::Helper - fork/run helper functions
 
     Continual::Process->new(
         name => 'test',
-        code => prepare_run($^X, '-ne "sleep 1"),
+        code => prepare_run($^X, '-ne "sleep 1"'),
     );
 
 =head1 DESCRIPTION
@@ -74,12 +73,14 @@ prepare and return correct (multiplatform) CodeRef which returns PID
 
 for Windows use L<Win32::Process>, for other platform fork-exec pattern
 
+set I<C_P_INSTANCE_ID> environment variable with C<$instance->id>
+
 =cut
 
 sub prepare_run {
     my ($executable, $args) = @_;
 
-    if ($^O eq 'MSWin32') {
+    if (WINDOWS) {
         return _prepare_run_win($executable, $args);
     }
 
@@ -88,28 +89,42 @@ sub prepare_run {
 
 sub _prepare_run_win {
     my ($executable, $args) = @_;
+        return sub {
+            my ($instance) = @_;
 
-    return sub {
-        my ($instance) = @_;
+            #This trick is copied from IPC::System::Simple
+            #If is check in this sub to non-Win32 system,
+            #perl don't check NORMAL_PRIORITY_CLASS constant in compilation phase.        
+            if (!WINDOWS) {
+               die '_prepare_run_win can be called only on Windows';
+            }
+            else {
+                $ENV{C_P_INSTANCE_ID} = $instance->id();
 
-        Win32::Process::Create(
-            my $proc,
-            $executable,
-            $args,
-            0,
-            NORMAL_PRIORITY_CLASS,
-            "."
-        ) || die "Process ".$instance->id."start fail $^E";
+                Win32::Process::Create(
+                    my $proc,
+                    $executable,
+                    "$executable $args",
+                    0,
+                    NORMAL_PRIORITY_CLASS,
+                    "."
+                ) || die "Process ".$instance->id."start fail $^E";
 
-        return $proc->GetProcesID();
-    };
+                return $proc->GetProcessID();
+            }
+        };
 }
 
 sub _prepare_run_other {
     my ($executable, $args) = @_;
 
     return prepare_fork(sub {
-        exec {$executable} $args;
+        my ($instance) = @_;
+
+        $ENV{C_P_INSTANCE_ID} = $instance->id();
+        print "# $executable $args\n" if $ENV{C_P_DEBUG}; 
+        exec $executable, $args;
+        die "exec fail";
     });
 }
 

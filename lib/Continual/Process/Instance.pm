@@ -2,6 +2,19 @@ package Continual::Process::Instance;
 use strict;
 use warnings;
 
+use constant WINDOWS => ($^O eq 'MSWin32');
+
+BEGIN {
+    if (WINDOWS) {
+        ## no critic (ProhibitStringyEval)
+        eval q{
+            use Win32::Process;
+        };
+
+        die $@ if $@;
+    }
+}
+
 use POSIX qw(:sys_wait_h);
 use Class::Tiny qw(name instance_id code pid parent_pid), {
     id => sub {
@@ -118,7 +131,13 @@ sub DESTROY {
     # ignore pseudo-process (<0) is threads and threads died with main
     if (defined $self->parent_pid && $self->parent_pid == $$ && $self->pid && $self->pid > 0) {
         print "# Kill PID ".$self->pid."\n" if $ENV{C_P_DEBUG};
-        kill 15, $self->pid;
+
+        if (WINDOWS) {
+            Win32::Process::KillProcess($self->pid, 0);
+        }
+        else {
+            kill 15, $self->pid;
+        }
     }
 }
 
