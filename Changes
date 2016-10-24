@@ -2,6 +2,10 @@ Revision history for Perl extension Recurring-Process
 
 {{$NEXT}}
 
+0.2.0 2016-10-24T07:10:05Z
+    - windows compatibility
+    - IO::Async support
+
 0.1.2 2016-10-16T18:31:19Z
     - work on windows OS
 
